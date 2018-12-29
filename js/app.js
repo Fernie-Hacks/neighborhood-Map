@@ -82,9 +82,7 @@ function initMap() {
 			populateInfoWindow(this, largeInfowindow);
 		});
 	}
-	
-	document.getElementById('show-listings').addEventListener('click', showListings);
-	document.getElementById('hide-listings').addEventListener('click', hideListings);
+	showListings();
 }
 
 // This function populates the infowindow when the marker is clicked. We'll only allow
@@ -124,11 +122,10 @@ function hideListings() {
 }
 
 /*
- * ViewModel <Octopus Controller>
+ * ViewModel <Octopus, Controller>
  *		Responsible for passing data between Viewer & Model.
  */
 var ViewModel = function(){
-	
 }
 
 // Call to start KO application
