@@ -115,7 +115,7 @@ var placeMarker = function(location) {
 		animation: google.maps.Animation.DROP,
 	});
 	
-	this.filterMarkers = ko.computed(function () {
+	this.updateMarkers = ko.computed(function () {
         // set marker and extend bounds (showListings)
         if(self.isVisible() === true) {
             self.marker.setMap(map);
@@ -149,20 +149,6 @@ var ViewModel = function(){
 	this.filter = ko.observable();
 	  
 	this.search = ko.observable('');
-
-	/*this.search = function(value) {
-		viewModel.locations.removeAll();
-
-		if (value == '') return;
-
-		for (var user in users) {
-			if (users[user].name.toLowerCase().indexOf(value.toLowerCase()) >= 0) {
-				viewModel.users.push(users[user]);
-			}
-		}
-	}*/
-	
-	
 	
 	this.selectPlace = function(location){		
 		self.locationsArray().forEach(function(place) {
@@ -173,27 +159,21 @@ var ViewModel = function(){
         });
 	};
 	
-	//this.selectPlace = ko.computed(function() {
-	//	self.locationArray
-	//}, self);
-	
-	/*
-    this.locationList = ko.computed(function() {
-        var searchFilter = self.searchItem().toLowerCase();
-        if (searchFilter) {
-            return ko.utils.arrayFilter(self.mapList(), function(location) {
-                var str = location.title.toLowerCase();
-                var result = str.includes(searchFilter);
-                location.visible(result);
-				return result;
+	this.searchText = ko.computed(function() {
+		var textToSearch = self.search().toLowerCase();
+		if(textToSearch) {
+			return ko.utils.arrayFilter(self.locationsArray(), function(location) {
+				var locStr = location.marker.title.toLowerCase();
+				var isValid = locStr.includes(textToSearch)
+				location.isVisible(isValid);
+				return isValid;
 			});
-        }
-        self.mapList().forEach(function(location) {
-            location.visible(true);
-        });
-        return self.mapList();
-    }, self);*/
-	
+		}
+		self.locationsArray().forEach(function(location) {
+			location.isVisible(true);
+		});
+		return self.locationsArray();
+	}, self);
 	
 	this.showPlaces = function(){
 		self.locationsArray().forEach(function(place) {

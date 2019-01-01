@@ -26,8 +26,7 @@
         </div>
         <form class="form-inline my-2 my-lg-0">
         	<input id="form-autocomplete" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" data-bind="textInput: search, valueUpdate: 'afterkeydown'">
-        	<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search
-        	</button>
+        	<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
         </form>
         
       </div><!-- /.container-fluid -->
@@ -36,9 +35,9 @@
     <div class="container">
       <div class="options-box">
         <div class="container-buttons">
-          <div  data-bind="foreach: locations" >
-          	<a data-bind="click: $parent.selectPlace" href="#">
-          		<span class="place-name" id="location" data-bind="text: title"> </span><br>
+          <div  data-bind="foreach: locationsArray" >
+          	<a data-bind="click: $parent.selectPlace, if: isVisible" href="#">
+          		<span class="place-name" id="location" data-bind="text: marker.title"> </span><br>
           	</a>
           </div>          
         </div>
