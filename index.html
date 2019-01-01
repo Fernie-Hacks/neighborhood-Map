@@ -25,9 +25,11 @@
           </a>
         </div>
         <form class="form-inline my-2 my-lg-0">
-        	<input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-        	<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        	<input id="form-autocomplete" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" data-bind="textInput: search, valueUpdate: 'afterkeydown'">
+        	<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search
+        	</button>
         </form>
+        
       </div><!-- /.container-fluid -->
     </nav>
   
@@ -44,7 +46,6 @@
       <div id="map"></div>
     </div>
     <script src="js/lib/knockout-3.4.2.js"></script>
-    <script src="js/map.js"></script>
     <script async defer
         src=
         "https://maps.googleapis.com/maps/api/js?key=GETYOUROWN&v=3&v=3&callback=initMap">
