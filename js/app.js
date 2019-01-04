@@ -185,7 +185,7 @@ var placeMarker = function(location) {
     $.ajax({
        url: myUrl,
        headers: {
-    	   'Authorization':'Bearer yelpAPIKey',
+    	   'Authorization':'Bearer YelpAccessKey',
        },
        method: 'GET',
        dataType: 'json',
@@ -198,7 +198,7 @@ var placeMarker = function(location) {
         		   if(data.total > 0){
         			   
         		   }
-        	    }, 200);
+        	    }, 1000);
            }
        }
     });
@@ -280,8 +280,3 @@ var ViewModel = function(){
         });
 	}
 }
-
-
-
-
-
