@@ -5,6 +5,7 @@
 var locations = [
     {
         title: 'Perris High School',
+        city: 'Perris',
         location: {
             lat: 33.8007538,
             lng: -117.22364399999998
@@ -12,6 +13,7 @@ var locations = [
     },
     {
         title: 'University of California, Riverside',
+        city: 'Riverside',
         location: {
             lat: 33.9756518,
             lng: -117.33111059999999
@@ -19,20 +21,15 @@ var locations = [
     },
     {
         title: 'In & Out',
+        city: 'Moreno Valley',
         location: {
             lat: 33.9421134,
             lng: -117.26013929999999
         }
     },
     {
-        title: 'The "C" Hike Trail',
-        location: {
-            lat: 33.9756409,
-            lng: -117.312588
-        }
-    },
-    {
         title: 'AhiPoki Bowl',
+        city: 'Moreno Valley',
         location: {
             lat: 33.9393618,
             lng: -117.2785237
@@ -40,9 +37,26 @@ var locations = [
     },
     {
         title: 'Chicago Pasta House',
+        city: 'Moreno Valley',
         location: {
             lat: 33.9387766,
             lng: -117.23218710000003
+        }
+    },
+    {
+        title: 'GLO Mini Golf Arcade',
+        city: 'Riverside',
+        location: {
+            lat: 33.923290,
+            lng: -117.470720
+        }
+    },
+    {
+        title: 'Lake Perris',
+        city: 'Perris',
+        location: {
+            lat: 33.862040,
+            lng: -117.200570
         }
     }
 ];
@@ -53,15 +67,14 @@ var infoWindow;
 var markers = [];
 
 /*
- * function initMap()
- * 		Responsible for loading the map in given location
- * 		Responsible for loading locations array
- * 		Invoked by the index.html script Google callback function
+ * function initMap() Responsible for loading the map in given location
+ * Responsible for loading locations array Invoked by the index.html script
+ * Google callback function
  */
 function initMap() {
 	// Constructor creates a new map - only center and zoom are required.
 	map = new google.maps.Map(document.getElementById('map'), {
-		center: {lat: 33.9425, lng: -117.2297},
+		center: {lat: 33.9756518, lng: -117.33111059999999},
 		zoom: 11,
 		mapTypeControl: false
 	});
@@ -74,50 +87,134 @@ function initMap() {
 }
 
 /*
- * function populateInfoWindow(marker, infowindow)
- * 		@param marker a specific marker object <Google maps API>
- * 		@param infowindow a specific infoWindow object <Google maps API>
- * 		Gets invoked when a marker is clicked by user
- * 		Opens the infoWindow and populates it
+ * function googleAPIError() Gets invoked when the call to load the Google API
+ * fails
  */
-function populateInfoWindow(marker, infowindow) {
-	// If this maker is already open ignore.
-	if (infowindow.marker != marker) {
-		infowindow.setContent('');
-		infowindow.marker = marker;
-		infowindow.setContent('<div>' + marker.title + '</div>');
-		infowindow.open(map, marker);
-		// Add listener in case user clicks the close window (x).
-		infowindow.addListener('closeclick', function() {
-			infowindow.marker = null;
-        });
-	}
+function googleAPIError(){
+	alert('An error occurred while loading Google Maps API.');
 }
 
 /*
- * function placeMarker(location)
- * 		@param location a single location entry
- * 		Creates a marker in the map using the location details
- * 		Invoked in the ViewModel 
+ * function populateInfoWindow(marker, infowindow) @param marker a specific
+ * marker object <Google maps API> @param infowindow a specific infoWindow
+ * object <Google maps API> Gets invoked when a marker is clicked by user Opens
+ * the infoWindow and populates it
+ */
+function populateInfoWindow(marker, infowindow, address, rating) {
+	// Check to make sure the infowindow is not already opened on this marker.
+    if (infowindow.marker != marker) {
+    	// Clear the infowindow content to give the streetview time to load.
+    	infowindow.setContent('');
+    	infowindow.marker = marker;
+    	// Make sure the marker property is cleared if the infowindow is closed.
+    	infowindow.addListener('closeclick', function() {
+    		infowindow.marker = null;
+    	});
+    	var streetViewService = new google.maps.StreetViewService();
+    	var radius = 50;
+    	var title = '<div>' + marker.title + '</div><div>';
+    	var addressStr = '<div>' + address + '</div><div>';
+    	
+    	var ratingStr = "<div>";
+    	
+    	for(i = 0; i < 5; i++){
+    		if(i < rating){
+    			ratingStr += '<span class="fa fa-star checked"></span>';
+    		}
+    		else{
+    			ratingStr += '<span class="fa fa-star">';
+    		}
+    	}
+    	ratingStr += "</div>";
+    	
+    	var windowContent = title + addressStr + ratingStr + '<div id="pano"></div>';
+    	
+    	// In case the status is OK, which means the pano was found, compute the
+    	// position of the streetview image, then calculate the heading, then
+		// get a
+    	// panorama from that and set the options
+    	function getStreetView(data, status) {
+    		if (status == google.maps.StreetViewStatus.OK) {
+    			var nearStreetViewLocation = data.location.latLng;
+    			var heading = google.maps.geometry.spherical.computeHeading(
+    					nearStreetViewLocation, marker.position);
+    			infowindow.setContent(windowContent);
+    			var panoramaOptions = {
+    					position: nearStreetViewLocation,
+    					pov: {
+    						heading: heading,
+    						pitch: 30
+    					}
+    			};
+    			var panorama = new google.maps.StreetViewPanorama(
+    					document.getElementById('pano'), panoramaOptions);
+    		} else {
+    			infowindow.setContent(windowContent +
+    			'<div>No Street View Found</div>');
+    		}
+    	}
+    	// Use streetview service to get the closest streetview image within
+    	// 50 meters of the markers position
+    	streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
+    	// Open the infowindow on the correct marker.
+    	infowindow.open(map, marker);
+    }
+}
+
+/*
+ * function placeMarker(location) @param location a single location entry
+ * Creates a marker in the map using the location details Invoked in the
+ * ViewModel
  */
 var placeMarker = function(location) {
 	var self = this;
 	// Get the position from the location array.
-	var position = location.location;
-	var title = location.title;
+	this.position = location.location;
+	this.title = location.title;
+	this.city = location.city;
+	this.rating = '';
+	this.address = '';
 	
 	this.isVisible = ko.observable(true);
 	
-	// Create a marker per location
+	// Yelp Data
+	
+    var yelpAPI = "https://cors-anywhere.herokuapp.com/https://api.yelp.com/v3/businesses/search?";
+    var params = "term="+ this.title + "&location="+ this.city + "  CA";
+    var myUrl = yelpAPI+params;
+    $.ajax({
+       url: myUrl,
+       headers: {
+    	   'Authorization':'Bearer yelpAPIKey',
+       },
+       method: 'GET',
+       dataType: 'json',
+       success: function(data){
+    	   if(data.total > 0){
+        	   self.rating = data.businesses[0].rating;
+        	   self.address = data.businesses[0].location.display_address[0] + ", " +
+        	   			data.businesses[0].location.display_address[1];
+        	   setTimeout(function () {
+        		   if(data.total > 0){
+        			   
+        		   }
+        	    }, 200);
+           }
+       }
+    });
+	
+	// Create a marker for the location
 	this.marker = new google.maps.Marker({
-		position: position,
-		title: title,
+		position: self.position,
+		title: self.title,
+		city: self.city,
 		animation: google.maps.Animation.DROP,
 	});
 	
-	this.updateMarkers = ko.computed(function () {
+	self.updateMarkers = ko.computed(function () {
         // set marker and extend bounds (showListings)
         if(self.isVisible() === true) {
+        	// Set map
             self.marker.setMap(map);
             bounds.extend(self.marker.position);
             map.fitBounds(bounds);
@@ -128,22 +225,24 @@ var placeMarker = function(location) {
 	
 	// Create an onClick event to open an infoWindow at each marker.
 	this.marker.addListener('click', function() {
-		populateInfoWindow(this, infoWindow);
+		populateInfoWindow(this, infoWindow, self.address, self.rating);
 	});
+	
 }
 
 /*
- * ViewModel <Octopus, Controller>
- *		Responsible for passing data between Viewer & Model.
+ * ViewModel <Octopus, Controller> Responsible for passing data between Viewer &
+ * Model.
  */
 var ViewModel = function(){
 	var self = this;
 	
 	this.locationsArray = ko.observableArray([]);
 	
-	// The following group uses the location array to create an array of markers.
+	// The following group uses the location array to create an array of
+	// markers.
 	for (var i = 0; i < locations.length; i++) {
-		this.locationsArray.push( new placeMarker(locations[i]) );
+		self.locationsArray.push( new placeMarker(locations[i]) );
 	}
 	
 	this.filter = ko.observable();
@@ -152,7 +251,7 @@ var ViewModel = function(){
 	
 	this.selectPlace = function(location){		
 		self.locationsArray().forEach(function(place) {
-			if(place.marker.title != location.title)
+			if(place.marker.title != location.marker.title)
 				place.isVisible(false);
 			else
 				place.isVisible(true);

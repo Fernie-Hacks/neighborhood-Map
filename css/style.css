@@ -20,10 +20,19 @@ html,body {
 	padding: 0;
 }
 
+.yelpLogo {
+	position: absolute;
+	bottom: 0;
+}
+
+.checked {
+  color: orange;
+}
+
 #map {
   	bottom:0px;
   	height: 100%;
-  	left: 20%;
+  	left: 25%;
   	position: absolute;
   	right: 0%;
 }
@@ -34,7 +43,7 @@ html,body {
   	line-height: 35px;
   	padding: 10px 10px 30px 10px;
   	text-align: left;
-  	max-width: 20%;
+  	max-width: 25%;
 }
 
 .container-buttons {
@@ -44,4 +53,9 @@ html,body {
 .place-name {
 	color: #007bff;
 	font-size: 1.2vw;
+}
+
+#pano {
+	width: 200px;
+	height: 200px;
 }
